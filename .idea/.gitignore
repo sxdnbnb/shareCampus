@@ -6,3 +6,35 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+# Compiled files
+target/
+*.class
+
+# IDE-specific files
+.idea/
+.classpath
+.project
+.settings/
+
+# Build tool configuration files
+*.iml
+*.ipr
+*.iws
+build/
+out/
+
+# Dependency files
+lib/
+*.jar
+*.war
+*.ear
+*.zip
+
+# Log files
+*.log
+
+# OS or editor generated files
+.DS_Store
+thumbs.db
+*.swp
+*.swo
