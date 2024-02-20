@@ -113,53 +113,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         stringRedisTemplate.expire(user_token,LOGIN_USER_TTL,TimeUnit.MINUTES);
         return Result.ok(token);
     }
-//    @Override
-//    public Result login(LoginFormDTO loginForm, HttpSession session){
-//        // 1.校验手机号
-//        String phone = loginForm.getPhone();
-//        log.debug("手机号码为：{}", phone);
-//        if (RegexUtils.isPhoneInvalid(phone)){
-//            //if 不符合，返回错误信息
-//            return Result.fail("手机号格式错误");
-//        }
-//        // 2.校验验证码
-//        //Object cachecode = session.getAttribute("code");
-//        String cachecode = stringRedisTemplate.opsForValue().get(LOGIN_CODE_KEY+phone);
-//        log.debug("Redis中验证码为：{}", cachecode);
-//        String code = loginForm.getCode();
-//        if (cachecode == null || !cachecode.equals(code)){
-//            //3.不一致，报错
-//            return Result.fail("验证码错误");
-//        }
-//        //根据手机号查询用户
-//        User user = query().eq("phone",phone).one();
-//
-//        //判断用户是否存在
-//        if (user == null){
-//            //不存在，创建用户
-//            user = createUserWithPhone(phone);
-//        }
-//        log.debug("用户为：{}", user.getNickName());
-//        //保存信息到redis
-//        //  随机生成token作为登录令牌、User转为Hash存储、存储、返回token到客户端
-//        String token = UUID.randomUUID().toString(true);
-//        String user_token = LOGIN_USER_KEY+token;
-//        log.debug("登录令牌为：{}", token);
-//        //session.setAttribute("user", BeanUtil.copyProperties(user, UserDTO.class));
-//        UserDTO userDTO = BeanUtil.copyProperties(user,UserDTO.class);
-//
-//        Map<String, Object> userMap = BeanUtil.beanToMap(userDTO);
-//        userMap.forEach((key, value) -> {
-//            if (null != value) userMap.put(key, String.valueOf(value));
-//        });
-//
-//        log.debug("UserTDO：{}", userMap);
-//        stringRedisTemplate.opsForHash().putAll(user_token,userMap);
-//        log.debug("token 存储成功");
-//        //设置有效期
-//        stringRedisTemplate.expire(user_token,LOGIN_USER_TTL,TimeUnit.MINUTES);
-//        return Result.ok(token);
-//    }
 
     @Override
     public Result sign() {
