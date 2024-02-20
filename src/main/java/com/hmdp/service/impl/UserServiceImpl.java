@@ -6,6 +6,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.dto.LoginFormDTO;
+import com.hmdp.dto.RegisterFormDTO;
 import com.hmdp.dto.Result;
 import com.hmdp.dto.UserDTO;
 import com.hmdp.entity.User;
@@ -86,7 +87,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 4. 验证密码是否正确，密码为md5值
         String loginFormPwdHash = DigestUtil.md5Hex(loginFormPassword+"salt");
         String passwordHashTrue = user.getPassword();
-        if (loginFormPwdHash != passwordHashTrue){
+        log.error("输入hsah"+loginFormPwdHash);
+        log.error("原始hsah"+loginFormPwdHash);
+        if (!loginFormPwdHash.equals(passwordHashTrue)){
             return Result.fail("手机号或密码错误");
         }
         log.debug("用户为：{}", user.getNickName());
@@ -202,6 +205,49 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             num >>>=1;
         }
         return Result.ok(cnt);
+    }
+
+    @Override
+    public Result register(RegisterFormDTO registerForm) {
+        // 1. 判断验证码是否正确
+        String code = registerForm.getCode();
+        if (RegexUtils.isCodeInvalid(code)){
+            return Result.fail("验证码错误");
+        }
+        // 2. 判断手机号是否合规
+        String phone = registerForm.getPhone();
+        if (RegexUtils.isPhoneInvalid(phone)){
+            return Result.fail("手机号码格式错误");
+        }
+        //手机号是否已经被注册
+        User user = query().eq("phone",phone).one();
+        if (user!=null){
+            return Result.fail("该账号已经存在");
+        }
+        // 3. 判断验证码是否相同
+        String cachecode = stringRedisTemplate.opsForValue().get(Register_CODE_KEY + phone);
+        if (cachecode == null || !cachecode.equals(code)){
+            //不一致，报错
+            return Result.fail("验证码错误");
+        }
+
+        // 4. 判断密码是否符合格式
+        String password = registerForm.getPassword();
+        if (RegexUtils.isPasswordInvalid(password)){
+            return Result.fail("密码格式错误");
+        }
+
+        // 5. 写入mysql
+        String pwdHash = DigestUtil.md5Hex(password + "salt");
+        user = new User();
+        user.setPhone(phone);
+        user.setNickName(USER_NICK_NAME_PREFIX+RandomUtil.randomString(10));
+        user.setPassword(pwdHash);
+        save(user);
+
+        // 6. 删除验证码
+        stringRedisTemplate.delete(Register_CODE_KEY + phone);
+        return Result.ok("账号创建成功");
     }
 
     private  User createUserWithPhone(String phone){

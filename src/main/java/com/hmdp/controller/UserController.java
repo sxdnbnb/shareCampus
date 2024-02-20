@@ -50,12 +50,11 @@ public class UserController {
 
     /*
     * 注册功能
-    *
+    *@param registerForm 注册参数，包含手机号、密码、验证码
     */
     @PostMapping("/register")
     public Result register(@RequestBody RegisterFormDTO registerForm){
-        // TODO
-        return Result.fail("尚未实现");
+        return userService.register(registerForm);
     }
 
 
