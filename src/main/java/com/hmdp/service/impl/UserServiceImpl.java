@@ -3,6 +3,7 @@ package com.hmdp.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.dto.LoginFormDTO;
@@ -12,13 +13,13 @@ import com.hmdp.dto.UserDTO;
 import com.hmdp.entity.User;
 import com.hmdp.mapper.UserMapper;
 import com.hmdp.service.IUserService;
+import com.hmdp.utils.RedisConstants;
 import com.hmdp.utils.RegexUtils;
 import com.hmdp.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.BitFieldSubCommands;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -30,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 
 import static com.hmdp.utils.RedisConstants.*;
 import static com.hmdp.utils.SystemConstants.USER_NICK_NAME_PREFIX;
-import static net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
 
 /**
  * <p>
@@ -250,12 +250,39 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return Result.ok("账号创建成功");
     }
 
-    private  User createUserWithPhone(String phone){
-        User user = new User();
-        user.setPhone(phone);
-        user.setNickName(USER_NICK_NAME_PREFIX+RandomUtil.randomString(10));
-        save(user);
-        return null;
+    @Override
+    public Result logout(String token) {
+        UserDTO userDTO = UserHolder.getUser();
+        if (userDTO == null){
+            return Result.fail("无账号登录");
+        }
+        Long userId = userDTO.getId();
+        if (StrUtil.isBlank(token)){
+            return Result.fail("认证错误");
+        }
+        Map<Object, Object> userMap = stringRedisTemplate.opsForHash().entries(RedisConstants.LOGIN_USER_KEY + token);
+        //判断用户是否存在
+        if (userMap.isEmpty()){
+            //不存在，拦截
+            return Result.fail("用户不存在");
+        }
+        //将查询到的hash数据转为userDTO对象
+        UserDTO userDTO_ = BeanUtil.fillBeanWithMap(userMap, new UserDTO(), false);
+        Long userId1 = userDTO_.getId();
+        if (!userId1.equals(userId)){
+            return Result.fail("用户信息不一致");
+        }
+        UserHolder.removeUser();
+        stringRedisTemplate.delete(RedisConstants.LOGIN_USER_KEY + token);
+        return Result.ok("已退出登录");
     }
+
+//    private  User createUserWithPhone(String phone){
+//        User user = new User();
+//        user.setPhone(phone);
+//        user.setNickName(USER_NICK_NAME_PREFIX+RandomUtil.randomString(10));
+//        save(user);
+//        return null;
+//    }
 
 }
