@@ -27,4 +27,6 @@ public interface IUserService extends IService<User> {
     Result signCount();
 
     Result register(RegisterFormDTO registerForm);
+
+    Result logout(String token);
 }
