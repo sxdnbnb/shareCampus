@@ -2,7 +2,7 @@ package com.hmdp.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hmdp.dto.Result;
-import com.hmdp.entity.Shop;
+import com.hmdp.entity.Venue;
 
 /**
  * <p>
@@ -12,10 +12,10 @@ import com.hmdp.entity.Shop;
  * @author 虎哥
  * @since 2021-12-22
  */
-public interface IShopService extends IService<Shop> {
+public interface IVenueService extends IService<Venue> {
 
     Result queryById(Long id);
-    Result updateByIdWithCache(Shop shop);
+    Result updateByIdWithCache(Venue venue);
 
-    Result queryShopByType(Integer typeId, Integer current, Double x, Double y);
+    Result queryVenueByType(Integer typeId, Integer current, Double x, Double y);
 }

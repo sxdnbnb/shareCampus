@@ -5,9 +5,9 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.dto.Result;
-import com.hmdp.entity.Shop;
-import com.hmdp.mapper.ShopMapper;
-import com.hmdp.service.IShopService;
+import com.hmdp.entity.Venue;
+import com.hmdp.mapper.VenueMapper;
+import com.hmdp.service.IVenueService;
 import com.hmdp.utils.CacheClient;
 import com.hmdp.utils.RedisConstants;
 import com.hmdp.utils.RedisData;
@@ -37,7 +37,7 @@ import static com.hmdp.utils.RedisConstants.SHOP_GEO_KEY;
  * @since 2021-12-22
  */
 @Service
-public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IShopService {
+public class VenueServiceImpl extends ServiceImpl<VenueMapper, Venue> implements IVenueService {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
@@ -48,8 +48,8 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     public Result queryById(Long id){
         //缓存穿透
 //        Shop shop = queryWithPassThrough(id);
-        Shop shop = cacheClient.queryWithPassThrough(
-                RedisConstants.CACHE_SHOP_KEY, id, Shop.class, this::getById,
+        Venue venue = cacheClient.queryWithPassThrough(
+                RedisConstants.CACHE_SHOP_KEY, id, Venue.class, this::getById,
                 RedisConstants.CACHE_SHOP_TTL,TimeUnit.MINUTES
                 );
         //缓存击穿
@@ -59,11 +59,11 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
 //                RedisConstants.CACHE_SHOP_KEY,id,Shop.class,this::getById,
 //                RedisConstants.CACHE_SHOP_TTL,TimeUnit.MINUTES
 //        );
-        log.debug("shop:"+shop);
-        if (shop == null){
+        log.debug("shop:"+ venue);
+        if (venue == null){
             return Result.fail("店铺不存在");
         }
-        return Result.ok(shop);
+        return Result.ok(venue);
 
     }
 
@@ -202,19 +202,19 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
 //    }
 
     public void saveShop2Redis(Long id,Long expireSeconds){
-        Shop shop = getById(id);
+        Venue venue = getById(id);
         RedisData redisData = new RedisData();
-        redisData.setData(shop);
+        redisData.setData(venue);
         redisData.setExpireTime(LocalDateTime.now().plusSeconds(expireSeconds));
         stringRedisTemplate.opsForValue().set(RedisConstants.CACHE_SHOP_KEY+id,JSONUtil.toJsonStr(redisData));
     }
     @Override
     @Transactional
-    public Result updateByIdWithCache(Shop shop) {
+    public Result updateByIdWithCache(Venue venue) {
         //更新数据库
-        updateById(shop);
+        updateById(venue);
         //删除缓存
-        Long id = shop.getId();
+        Long id = venue.getId();
         if (id == null){
             return Result.fail("店铺id为空");
         }
@@ -223,10 +223,10 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     }
 
     @Override
-    public Result queryShopByType(Integer typeId, Integer current, Double x, Double y) {
+    public Result queryVenueByType(Integer typeId, Integer current, Double x, Double y) {
         // 判断是否需要根据坐标查询
         if (x == null || y == null){
-            Page<Shop> page = query()
+            Page<Venue> page = query()
                     .eq("type_id", typeId)
                     .page(new Page<>(current, SystemConstants.DEFAULT_PAGE_SIZE));
             return Result.ok(page.getRecords());
@@ -259,10 +259,10 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
             return Result.ok(Collections.emptyList());
         }
         String idStr = StrUtil.join(",", ids);
-        List<Shop> shops = query().in("id", ids).last("ORDER BY FIELD(id, "+idStr+")").list();
-        for (Shop shop: shops){
-            shop.setDistance(distanceMap.get(shop.getId().toString()).getValue());
+        List<Venue> venues = query().in("id", ids).last("ORDER BY FIELD(id, "+idStr+")").list();
+        for (Venue venue : venues){
+            venue.setDistance(distanceMap.get(venue.getId().toString()).getValue());
         }
-        return Result.ok(shops);
+        return Result.ok(venues);
     }
 }

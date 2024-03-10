@@ -2,12 +2,14 @@ package com.hmdp.controller;
 
 
 import com.hmdp.dto.Result;
-import com.hmdp.service.IShopTypeService;
+import com.hmdp.entity.VenueType;
+import com.hmdp.service.IVenueTypeService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>
@@ -18,10 +20,10 @@ import javax.annotation.Resource;
  * @since 2021-12-22
  */
 @RestController
-@RequestMapping("/shop-type")
-public class ShopTypeController {
+@RequestMapping("/venue-type")
+public class VenueTypeController {
     @Resource
-    private IShopTypeService typeService;
+    private IVenueTypeService typeService;
     /*
     @GetMapping("list")
     public Result queryTypeList() {
@@ -31,7 +33,6 @@ public class ShopTypeController {
     }*/
     @GetMapping("list")
     public Result queryTypeList() {
-
         return typeService.queryList();
     }
 }
