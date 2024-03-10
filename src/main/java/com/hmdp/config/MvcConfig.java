@@ -21,9 +21,9 @@ public class MvcConfig implements WebMvcConfigurer {
                         "/user/login",
                         "/user/register",
                         "/blog/hot",
-                        "/shop/**",
+                        "/venue/**",
                         "/voucher/**",
-                        "/shop-type/**",
+                        "/venue-type/**",
                         "/upload/**"
                 ).order(1);
         registry.addInterceptor(new RefreshTokenInterceptor(stringRedisTemplate))
@@ -32,9 +32,9 @@ public class MvcConfig implements WebMvcConfigurer {
                         "/user/login",
                         "/user/register",
                         "/blog/hot",
-                        "/shop/**",
+                        "/venue/**",
                         "/voucher/**",
-                        "/shop-type/**",
+                        "/venue-type/**",
                         "/upload/**"
                 ).order(0);
     }

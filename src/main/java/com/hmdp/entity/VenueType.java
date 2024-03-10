@@ -22,8 +22,8 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("tb_shop_type")
-public class ShopType implements Serializable {
+@TableName("venue_type")
+public class VenueType implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -41,7 +41,7 @@ public class ShopType implements Serializable {
     /**
      * 图标
      */
-    private String icon;
+    // private String icon;
 
     /**
      * 顺序

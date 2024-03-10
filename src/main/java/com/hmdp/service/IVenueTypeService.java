@@ -2,7 +2,7 @@ package com.hmdp.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hmdp.dto.Result;
-import com.hmdp.entity.ShopType;
+import com.hmdp.entity.VenueType;
 
 /**
  * <p>
@@ -12,7 +12,6 @@ import com.hmdp.entity.ShopType;
  * @author 虎哥
  * @since 2021-12-22
  */
-public interface IShopTypeService extends IService<ShopType> {
-
+public interface IVenueTypeService extends IService<VenueType> {
     Result queryList();
 }

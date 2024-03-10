@@ -1,7 +1,7 @@
 package com.hmdp.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.hmdp.entity.ShopType;
+import com.hmdp.entity.Venue;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.hmdp.entity.ShopType;
  * @author 虎哥
  * @since 2021-12-22
  */
-public interface ShopTypeMapper extends BaseMapper<ShopType> {
+public interface VenueMapper extends BaseMapper<Venue> {
 
 }

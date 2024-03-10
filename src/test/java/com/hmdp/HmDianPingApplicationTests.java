@@ -1,7 +1,7 @@
 package com.hmdp;
 
-import com.hmdp.entity.Shop;
-import com.hmdp.service.impl.ShopServiceImpl;
+import com.hmdp.entity.Venue;
+import com.hmdp.service.impl.VenueServiceImpl;
 import com.hmdp.utils.RedisIdWorker;
 import com.hmdp.utils.UserHolder;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import static com.hmdp.utils.RedisConstants.SHOP_GEO_KEY;
 @SpringBootTest
 class HmDianPingApplicationTests {
     @Resource
-    private ShopServiceImpl shopService;
+    private VenueServiceImpl shopService;
     @Resource
     private RedisIdWorker redisIdWorker;
     @Resource
@@ -60,20 +60,20 @@ class HmDianPingApplicationTests {
     @Test
     void loadshopdata(){
         // 1. 查询店铺信息
-        List<Shop> list = shopService.list();
+        List<Venue> list = shopService.list();
         // 2. 将店铺按照typeid分组
-        Map<Long,List<Shop>> map= list.stream().collect(Collectors.groupingBy(Shop::getTypeId));
+        Map<Long,List<Venue>> map= list.stream().collect(Collectors.groupingBy(Venue::getTypeId));
         // 3. 分批完成写入
-        for (Map.Entry<Long, List<Shop>> entry: map.entrySet()){
+        for (Map.Entry<Long, List<Venue>> entry: map.entrySet()){
             Long typeId = entry.getKey();
             String key = SHOP_GEO_KEY+typeId;
-            List<Shop> value = entry.getValue();
+            List<Venue> value = entry.getValue();
             List<RedisGeoCommands.GeoLocation<String>> locations = new ArrayList<>(value.size());
-            for (Shop shop:value){
+            for (Venue venue :value){
                 //stringRedisTemplate.opsForGeo().add(key,new Point(shop.getX(),shop.getY()),shop.getId().toString());
                 locations.add(
                         new RedisGeoCommands.GeoLocation<>(
-                                shop.getId().toString(),new Point(shop.getX(),shop.getY()
+                                venue.getId().toString(),new Point(venue.getX(), venue.getY()
                         )
                         ));
             }
