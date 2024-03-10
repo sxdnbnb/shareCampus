@@ -39,11 +39,6 @@ public class VenueType implements Serializable {
     private String name;
 
     /**
-     * 图标
-     */
-    // private String icon;
-
-    /**
      * 顺序
      */
     private Integer sort;

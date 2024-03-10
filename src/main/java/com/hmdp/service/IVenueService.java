@@ -16,6 +16,6 @@ public interface IVenueService extends IService<Venue> {
 
     Result queryById(Long id);
     Result updateByIdWithCache(Venue venue);
-
-    Result queryVenueByType(Integer typeId, Integer current, Double x, Double y);
+    Result deleteByIdWithCache(Venue venue);
+    Result queryVenueByType(Integer typeId, Integer current);
 }

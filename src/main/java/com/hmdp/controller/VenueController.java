@@ -32,7 +32,7 @@ public class VenueController {
      * @return 场所详情数据
      */
     @GetMapping("/{id}")
-    public Result queryvenueById(@PathVariable("id") Long id) {
+    public Result queryVenueById(@PathVariable("id") Long id) {
         return venueService.queryById(id);
     }
 
@@ -42,7 +42,8 @@ public class VenueController {
      * @return 场所id
      */
     @PostMapping
-    public Result savevenue(@RequestBody Venue venue) {
+    public Result saveVenue(@RequestBody Venue venue) {
+        System.out.println(venue);
         // 写入数据库
         venueService.save(venue);
         // 返回店铺id
@@ -55,26 +56,37 @@ public class VenueController {
      * @return 无
      */
     @PutMapping
-    public Result updatevenue(@RequestBody Venue venue) {
+    public Result updateVenue(@RequestBody Venue venue) {
         // 写入数据库
         //venueService.updateById(venue);
         return venueService.updateByIdWithCache(venue);
     }
 
     /**
+     * 删除场所信息
+     * @param venue 场所数据
+     * @return 无
+     */
+    @DeleteMapping
+    public Result deleteVenue(@RequestBody Venue venue) {
+        // 写入数据库
+        //venueService.updateById(venue);
+        return venueService.deleteByIdWithCache(venue);
+    }
+
+
+    /**
      * 根据场所类型分页查询场所信息
-     * @param typeId 场所类型
+     * @param typeId 场所类型ID
      * @param current 页码
      * @return 场所列表
      */
     @GetMapping("/of/type")
     public Result queryVenueByType(
             @RequestParam("typeId") Integer typeId,
-            @RequestParam(value = "current", defaultValue = "1") Integer current,
-            @RequestParam(value = "x", required = false) Double x,
-            @RequestParam(value = "y", required = false) Double y
+            @RequestParam(value = "current", defaultValue = "1") Integer current
     ) {
-        return venueService.queryVenueByType(typeId, current, x,y);
+        return venueService.queryVenueByType(typeId, current);
     }
 
     /**
@@ -84,7 +96,7 @@ public class VenueController {
      * @return 场所列表
      */
     @GetMapping("/of/name")
-    public Result queryvenueByName(
+    public Result queryVenueByName(
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "current", defaultValue = "1") Integer current
     ) {

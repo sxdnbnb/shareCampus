@@ -26,11 +26,11 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static com.hmdp.utils.RedisConstants.SHOP_GEO_KEY;
+import static com.hmdp.utils.RedisConstants.Venue_GEO_KEY;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author 虎哥
@@ -45,22 +45,22 @@ public class VenueServiceImpl extends ServiceImpl<VenueMapper, Venue> implements
     private CacheClient cacheClient;
 
     @Override
-    public Result queryById(Long id){
-        //缓存穿透
+    public Result queryById(Long id) {
+        // 缓存穿透
 //        Shop shop = queryWithPassThrough(id);
         Venue venue = cacheClient.queryWithPassThrough(
-                RedisConstants.CACHE_SHOP_KEY, id, Venue.class, this::getById,
-                RedisConstants.CACHE_SHOP_TTL,TimeUnit.MINUTES
-                );
-        //缓存击穿
-        //Shop shop = queryWithMutex(id);
-        //逻辑过期
+                RedisConstants.CACHE_Venue_KEY, id, Venue.class, this::getById,
+                RedisConstants.CACHE_Venue_TTL, TimeUnit.MINUTES
+        );
+        // 缓存击穿
+        // Shop shop = queryWithMutex(id);
+        // 逻辑过期
 //        Shop shop = cacheClient.queryWithLogicalExpire(
 //                RedisConstants.CACHE_SHOP_KEY,id,Shop.class,this::getById,
 //                RedisConstants.CACHE_SHOP_TTL,TimeUnit.MINUTES
 //        );
-        log.debug("shop:"+ venue);
-        if (venue == null){
+        log.debug("venue:" + venue);
+        if (venue == null) {
             return Result.fail("店铺不存在");
         }
         return Result.ok(venue);
@@ -201,68 +201,82 @@ public class VenueServiceImpl extends ServiceImpl<VenueMapper, Venue> implements
 //        stringRedisTemplate.delete(key);
 //    }
 
-    public void saveShop2Redis(Long id,Long expireSeconds){
+    public void saveVenueRedis(Long id, Long expireSeconds) {
         Venue venue = getById(id);
         RedisData redisData = new RedisData();
         redisData.setData(venue);
         redisData.setExpireTime(LocalDateTime.now().plusSeconds(expireSeconds));
-        stringRedisTemplate.opsForValue().set(RedisConstants.CACHE_SHOP_KEY+id,JSONUtil.toJsonStr(redisData));
+        stringRedisTemplate.opsForValue().set(RedisConstants.CACHE_Venue_KEY + id, JSONUtil.toJsonStr(redisData));
     }
+
     @Override
     @Transactional
     public Result updateByIdWithCache(Venue venue) {
-        //更新数据库
+        // 更新数据库
         updateById(venue);
-        //删除缓存
+        // 删除缓存
         Long id = venue.getId();
-        if (id == null){
-            return Result.fail("店铺id为空");
+        if (id == null) {
+            return Result.fail("没有该场所");
         }
-        stringRedisTemplate.delete(RedisConstants.CACHE_SHOP_KEY+id);
+        stringRedisTemplate.delete(RedisConstants.CACHE_Venue_KEY + id);
         return Result.ok();
     }
 
     @Override
-    public Result queryVenueByType(Integer typeId, Integer current, Double x, Double y) {
-        // 判断是否需要根据坐标查询
-        if (x == null || y == null){
-            Page<Venue> page = query()
-                    .eq("type_id", typeId)
-                    .page(new Page<>(current, SystemConstants.DEFAULT_PAGE_SIZE));
-            return Result.ok(page.getRecords());
+    @Transactional
+    public Result deleteByIdWithCache(Venue venue) {
+        // 删除数据库
+        removeById(venue);
+        // 删除缓存
+        Long id = venue.getId();
+        if (id == null) {
+            return Result.fail("没有该场所");
         }
-        int from = (current-1)*SystemConstants.DEFAULT_PAGE_SIZE;
-        int end = (current)*SystemConstants.DEFAULT_PAGE_SIZE;
-        String key = SHOP_GEO_KEY+typeId;
-        GeoResults<RedisGeoCommands.GeoLocation<String>> results = stringRedisTemplate.opsForGeo()
-                .search(key,
-                        GeoReference.fromCoordinate(x, y),
-                        new Distance(5000),
-                        RedisGeoCommands.GeoSearchCommandArgs.newGeoSearchArgs().includeDistance().limit(end)
-                );
-        if (results == null){
-            return Result.ok(Collections.emptyList());
-        }
-        List<GeoResult<RedisGeoCommands.GeoLocation<String>>> list = results.getContent();
-        if (list.size()<=from){
-            return  Result.ok(Collections.emptyList());
-        }
-        List<Long> ids = new ArrayList<>(list.size());
-        Map<String,Distance> distanceMap = new HashMap<>(list.size());
-        list.stream().skip(from).forEach(result->{
-            String shopIdStr = result.getContent().getName();
-            ids.add(Long.valueOf(shopIdStr));
-            Distance dis = result.getDistance();
-            distanceMap.put(shopIdStr,dis);
-        });
-        if (list.size()==0){
-            return Result.ok(Collections.emptyList());
-        }
-        String idStr = StrUtil.join(",", ids);
-        List<Venue> venues = query().in("id", ids).last("ORDER BY FIELD(id, "+idStr+")").list();
-        for (Venue venue : venues){
-            venue.setDistance(distanceMap.get(venue.getId().toString()).getValue());
-        }
-        return Result.ok(venues);
+        stringRedisTemplate.delete(RedisConstants.CACHE_Venue_KEY + id);
+        return Result.ok();
+    }
+
+    @Override
+    public Result queryVenueByType(Integer typeId, Integer current) {
+        // 不需要坐标查询
+        Page<Venue> page = query()
+                .eq("type_id", typeId)
+                .page(new Page<>(current, SystemConstants.DEFAULT_PAGE_SIZE));
+        return Result.ok(page.getRecords());
+
+        // int from = (current-1)*SystemConstants.DEFAULT_PAGE_SIZE;
+        // int end = (current)*SystemConstants.DEFAULT_PAGE_SIZE;
+        // String key = Venue_GEO_KEY+typeId;
+        // GeoResults<RedisGeoCommands.GeoLocation<String>> results = stringRedisTemplate.opsForGeo()
+        //         .search(key,
+        //                 GeoReference.fromCoordinate(x, y),
+        //                 new Distance(5000),
+        //                 RedisGeoCommands.GeoSearchCommandArgs.newGeoSearchArgs().includeDistance().limit(end)
+        //         );
+        // if (results == null){
+        //     return Result.ok(Collections.emptyList());
+        // }
+        // List<GeoResult<RedisGeoCommands.GeoLocation<String>>> list = results.getContent();
+        // if (list.size()<=from){
+        //     return  Result.ok(Collections.emptyList());
+        // }
+        // List<Long> ids = new ArrayList<>(list.size());
+        // Map<String,Distance> distanceMap = new HashMap<>(list.size());
+        // list.stream().skip(from).forEach(result->{
+        //     String shopIdStr = result.getContent().getName();
+        //     ids.add(Long.valueOf(shopIdStr));
+        //     Distance dis = result.getDistance();
+        //     distanceMap.put(shopIdStr,dis);
+        // });
+        // if (list.size()==0){
+        //     return Result.ok(Collections.emptyList());
+        // }
+        // String idStr = StrUtil.join(",", ids);
+        // List<Venue> venues = query().in("id", ids).last("ORDER BY FIELD(id, "+idStr+")").list();
+        // for (Venue venue : venues){
+        //     venue.setDistance(distanceMap.get(venue.getId().toString()).getValue());
+        // }
+        // return Result.ok(venues);
     }
 }
