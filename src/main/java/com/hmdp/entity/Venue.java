@@ -16,13 +16,11 @@ import java.time.LocalDateTime;
  * 
  * </p>
  *
- * @author 虎哥
- * @since 2021-12-22
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("tb_shop")
+@TableName("venue")
 public class Venue implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -34,22 +32,17 @@ public class Venue implements Serializable {
     private Long id;
 
     /**
-     * 商铺名称
+     * 场所名称
      */
     private String name;
 
     /**
-     * 商铺类型的id
+     * 场所类型的id
      */
     private Long typeId;
 
     /**
-     * 商铺图片，多个图片以','隔开
-     */
-    private String images;
-
-    /**
-     * 商圈，例如陆家嘴
+     * 场所类型
      */
     private String area;
 
@@ -58,25 +51,6 @@ public class Venue implements Serializable {
      */
     private String address;
 
-    /**
-     * 经度
-     */
-    private Double x;
-
-    /**
-     * 维度
-     */
-    private Double y;
-
-    /**
-     * 均价，取整数
-     */
-    private Long avgPrice;
-
-    /**
-     * 销量
-     */
-    private Integer sold;
 
     /**
      * 评论数量

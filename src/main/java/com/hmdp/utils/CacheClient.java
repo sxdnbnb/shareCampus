@@ -83,7 +83,7 @@ public class CacheClient {
             //log.debug("AfterNow");
             return r;
         }
-        String lockKey = RedisConstants.LOCK_SHOP_KEY+id;
+        String lockKey = RedisConstants.LOCK_Venue_KEY+id;
         boolean isLock = tryLock(lockKey);
         if (isLock){
             //开启独立线程实现重建
@@ -121,7 +121,7 @@ public class CacheClient {
         }
         //实现缓存重建
         //获取互斥锁
-        String lockkey = RedisConstants.LOCK_SHOP_KEY + id;
+        String lockkey = RedisConstants.LOCK_Venue_KEY + id;
         R r = null;
         try {
             boolean isLock = tryLock(lockkey);
@@ -142,7 +142,7 @@ public class CacheClient {
             // 不存在，返回错误
             if (r == null) {
                 stringRedisTemplate.opsForValue().set(
-                        RedisConstants.CACHE_SHOP_KEY + id.toString(), "",
+                        RedisConstants.CACHE_Venue_KEY + id.toString(), "",
                         RedisConstants.CACHE_NULL_TTL, TimeUnit.MINUTES);
                 return null;
             }
@@ -160,7 +160,7 @@ public class CacheClient {
     }
 
     private boolean tryLock(String key){
-        boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(key,"1",RedisConstants.LOCK_SHOP_TTL,TimeUnit.SECONDS);
+        boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(key,"1",RedisConstants.LOCK_Venue_TTL,TimeUnit.SECONDS);
         return BooleanUtil.isTrue(flag);
     }
 
