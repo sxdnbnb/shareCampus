@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import static com.hmdp.utils.RedisConstants.SHOP_GEO_KEY;
+import static com.hmdp.utils.RedisConstants.Venue_GEO_KEY;
 
 @SpringBootTest
 class HmDianPingApplicationTests {
@@ -66,17 +66,9 @@ class HmDianPingApplicationTests {
         // 3. 分批完成写入
         for (Map.Entry<Long, List<Venue>> entry: map.entrySet()){
             Long typeId = entry.getKey();
-            String key = SHOP_GEO_KEY+typeId;
+            String key = Venue_GEO_KEY+typeId;
             List<Venue> value = entry.getValue();
             List<RedisGeoCommands.GeoLocation<String>> locations = new ArrayList<>(value.size());
-            for (Venue venue :value){
-                //stringRedisTemplate.opsForGeo().add(key,new Point(shop.getX(),shop.getY()),shop.getId().toString());
-                locations.add(
-                        new RedisGeoCommands.GeoLocation<>(
-                                venue.getId().toString(),new Point(venue.getX(), venue.getY()
-                        )
-                        ));
-            }
             stringRedisTemplate.opsForGeo().add(key,locations);
         }
     }

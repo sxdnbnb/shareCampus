@@ -9,8 +9,6 @@ import com.hmdp.entity.VenueType;
  *  服务类
  * </p>
  *
- * @author 虎哥
- * @since 2021-12-22
  */
 public interface IVenueTypeService extends IService<VenueType> {
     Result queryList();
