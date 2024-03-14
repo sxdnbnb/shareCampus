@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import static com.sharecampus.utils.RedisConstants.Venue_GEO_KEY;
 
 @SpringBootTest
-class HmDianPingApplicationTests {
+class ShareCampusApplicationTests {
     @Resource
     private VenueServiceImpl shopService;
     @Resource
