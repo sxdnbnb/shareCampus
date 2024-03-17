@@ -32,61 +32,42 @@ public class Voucher implements Serializable {
     private Long id;
 
     /**
-     * 商铺id
+     * 场馆id
      */
-    private Long shopId;
+    private Long venueId;
 
     /**
-     * 代金券标题
+     * 场馆券标题
      */
     private String title;
 
-    /**
-     * 副标题
-     */
-    private String subTitle;
 
     /**
-     * 使用规则
+     * 使用时间规则
      */
     private String rules;
 
     /**
-     * 支付金额
-     */
-    private Long payValue;
-
-    /**
-     * 抵扣金额
-     */
-    private Long actualValue;
-
-    /**
-     * 优惠券类型
-     */
-    private Integer type;
-
-    /**
-     * 优惠券类型
-     */
-    private Integer status;
-    /**
      * 库存
      */
-    @TableField(exist = false)
     private Integer stock;
 
     /**
-     * 生效时间
+     * 发放时间
      */
-    @TableField(exist = false)
+    // @TableField(exist = false)
     private LocalDateTime beginTime;
 
     /**
-     * 失效时间
+     * 发放结束时间
      */
-    @TableField(exist = false)
+    // @TableField(exist = false)
     private LocalDateTime endTime;
+
+    /**
+     * 场所类型的id
+     */
+    private Long typeId;
 
     /**
      * 创建时间

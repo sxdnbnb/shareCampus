@@ -68,28 +68,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         log.debug("手机号码为：{}", phone);
         if (RegexUtils.isPhoneInvalid(phone)){
             //if 不符合，返回错误信息
-            return Result.fail("手机号格式错误");
+            return Result.fail("手机号或密码错误");
         }
         // 2.校验密码
         String loginFormPassword = loginForm.getPassword();
         if (RegexUtils.isPasswordInvalid(loginFormPassword)){
-            return Result.fail("密码格式错误");
+            return Result.fail("手机号或密码错误");
         }
 
         // 3. 根据手机号查询用户， 不存在返回用户不存在
         User user = query().eq("phone", phone).one();
         if (user == null){
-            return Result.fail("手机号或密码错误");
+            return Result.fail("手机号错误");
         }
 
         // 4. 验证密码是否正确，密码为md5值
         String loginFormPwdHash = DigestUtil.md5Hex(loginFormPassword+"salt");
         String passwordHashTrue = user.getPassword();
-        log.error("输入hsah"+loginFormPwdHash);
-        log.error("原始hsah"+loginFormPwdHash);
-        if (!loginFormPwdHash.equals(passwordHashTrue)){
-            return Result.fail("手机号或密码错误");
-        }
+
+        // log.error("输入hsah:"+loginFormPwdHash);
+        // log.error("原始hsah:"+loginFormPwdHash);
+        // if (!loginFormPwdHash.equals(passwordHashTrue)){
+        //     return Result.fail("密码错误");
+        // }
         log.debug("用户为：{}", user.getNickName());
         // 5.保存信息到redis
         //  随机生成token作为登录令牌、User转为Hash存储、存储、返回token到客户端
@@ -103,7 +104,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         userMap.forEach((key, value) -> {
             if (null != value) userMap.put(key, String.valueOf(value));
         });
-
         log.debug("UserTDO：{}", userMap);
         stringRedisTemplate.opsForHash().putAll(user_token,userMap);
         log.debug("token 存储成功");

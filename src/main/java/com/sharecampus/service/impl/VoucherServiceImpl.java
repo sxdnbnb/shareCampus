@@ -25,9 +25,6 @@ import java.util.List;
 public class VoucherServiceImpl extends ServiceImpl<VoucherMapper, Voucher> implements IVoucherService {
 
     @Resource
-    private ISeckillVoucherService seckillVoucherService;
-
-    @Resource
     private StringRedisTemplate stringRedisTemplate;
 
     @Override
@@ -41,16 +38,13 @@ public class VoucherServiceImpl extends ServiceImpl<VoucherMapper, Voucher> impl
     @Override
     @Transactional
     public void addSeckillVoucher(Voucher voucher) {
-        // 保存优惠券
+        // 保存场馆券
         save(voucher);
-        // 保存秒杀信息
-        SeckillVoucher seckillVoucher = new SeckillVoucher();
-        seckillVoucher.setVoucherId(voucher.getId());
-        seckillVoucher.setStock(voucher.getStock());
-        seckillVoucher.setBeginTime(voucher.getBeginTime());
-        seckillVoucher.setEndTime(voucher.getEndTime());
-        seckillVoucherService.save(seckillVoucher);
-        //保存秒杀库存带redis中
+        //保存场馆券库存到redis中
         stringRedisTemplate.opsForValue().set(RedisConstants.SECKILL_STOCK_KEY +voucher.getId(), voucher.getStock().toString());
+        //保存秒杀开始时间到redis中
+        stringRedisTemplate.opsForValue().set(RedisConstants.SECKILL_BRGIN_Time_KEY +voucher.getId(), voucher.getBeginTime().toString());
+        //保存秒杀结束时间到redis中
+        stringRedisTemplate.opsForValue().set(RedisConstants.SECKILL_END_Time_KEY +voucher.getId(), voucher.getEndTime().toString());
     }
 }

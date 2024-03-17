@@ -36,7 +36,7 @@ public class VoucherOrder implements Serializable {
     private Long userId;
 
     /**
-     * 购买的代金券id
+     * 预约的场馆信息id
      */
     private Long voucherId;
 
