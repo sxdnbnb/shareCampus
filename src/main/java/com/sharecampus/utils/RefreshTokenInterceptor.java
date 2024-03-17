@@ -2,6 +2,7 @@ package com.sharecampus.utils;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.sharecampus.dto.UserDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -10,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
+@Slf4j
 public class RefreshTokenInterceptor implements HandlerInterceptor{
     private StringRedisTemplate stringRedisTemplate;
     public RefreshTokenInterceptor(StringRedisTemplate stringRedisTemplate){
@@ -22,6 +23,7 @@ public class RefreshTokenInterceptor implements HandlerInterceptor{
         //HttpSession session = request.getSession();
         String token = request.getHeader("authorization");
         if (StrUtil.isBlank(token)){
+            log.debug("token为空");
             response.setStatus(401);
             return false;
         }
@@ -30,6 +32,7 @@ public class RefreshTokenInterceptor implements HandlerInterceptor{
         Map<Object, Object> userMap = stringRedisTemplate.opsForHash().entries(RedisConstants.LOGIN_USER_KEY + token);
         //判断用户是否存在
         if (userMap.isEmpty()){
+            log.debug("用户不存在");
             //不存在，拦截
             response.setStatus(401);
             return false;

@@ -25,7 +25,9 @@ public class MvcConfig implements WebMvcConfigurer {
                         "/voucher/**",
                         "/venue-type/**",
                         "/upload/**"
+                        // "/voucher-order/**"
                 ).order(1);
+        // token刷新的拦截器
         registry.addInterceptor(new RefreshTokenInterceptor(stringRedisTemplate))
                 .excludePathPatterns(
                         "/user/code",
@@ -36,6 +38,7 @@ public class MvcConfig implements WebMvcConfigurer {
                         "/voucher/**",
                         "/venue-type/**",
                         "/upload/**"
+                        // "/voucher-order/**"
                 ).order(0);
     }
 }
