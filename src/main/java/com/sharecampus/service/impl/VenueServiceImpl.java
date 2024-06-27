@@ -35,7 +35,7 @@ public class VenueServiceImpl extends ServiceImpl<VenueMapper, Venue> implements
     public Result updateByIdWithCache(Venue venue) {
         Long id = venue.getId();
         if (id == null) {
-            return Result.fail("没有该场所");
+            return Result.fail("场所id不能为空");
         }
         // 更新数据库
         updateById(venue);

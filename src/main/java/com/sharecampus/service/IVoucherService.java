@@ -12,7 +12,8 @@ import com.sharecampus.entity.Voucher;
  */
 public interface IVoucherService extends IService<Voucher> {
 
-    Result queryVoucher(String title, Integer current);
-
+    Result queryVoucher(Long id);
+    Result deleteVoucher(Voucher voucher);
+    Result updateVoucher(Voucher voucher);
     Result addSeckillVoucher(Voucher voucher);
 }
