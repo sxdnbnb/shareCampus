@@ -1,19 +1,19 @@
 package com.sharecampus.service.impl;
 
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sharecampus.dto.Result;
-import com.sharecampus.entity.SeckillVoucher;
 import com.sharecampus.entity.Voucher;
 import com.sharecampus.mapper.VoucherMapper;
-import com.sharecampus.service.ISeckillVoucherService;
 import com.sharecampus.service.IVoucherService;
 import com.sharecampus.utils.RedisConstants;
+import com.sharecampus.utils.SystemConstants;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * <p>
@@ -28,16 +28,18 @@ public class VoucherServiceImpl extends ServiceImpl<VoucherMapper, Voucher> impl
     private StringRedisTemplate stringRedisTemplate;
 
     @Override
-    public Result queryVoucherOfShop(Long shopId) {
-        // 查询优惠券信息
-        List<Voucher> vouchers = getBaseMapper().queryVoucherOfShop(shopId);
-        // 返回结果
-        return Result.ok(vouchers);
+    public Result queryVoucher(String title, Integer current) {
+        // 根据名称分页查询
+        Page<Voucher> page = query()
+                .like(StrUtil.isNotBlank(title), "title", title)
+                .page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
+        // 返回数据
+        return Result.ok(page.getRecords());
     }
 
     @Override
     @Transactional
-    public void addSeckillVoucher(Voucher voucher) {
+    public Result addSeckillVoucher(Voucher voucher) {
         // 保存场馆券
         save(voucher);
         //保存场馆券库存到redis中
@@ -46,5 +48,6 @@ public class VoucherServiceImpl extends ServiceImpl<VoucherMapper, Voucher> impl
         stringRedisTemplate.opsForValue().set(RedisConstants.SECKILL_BRGIN_Time_KEY +voucher.getId(), voucher.getBeginTime().toString());
         //保存秒杀结束时间到redis中
         stringRedisTemplate.opsForValue().set(RedisConstants.SECKILL_END_Time_KEY +voucher.getId(), voucher.getEndTime().toString());
+        return Result.ok(voucher.getId());
     }
 }

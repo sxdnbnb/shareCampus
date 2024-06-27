@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("tb_voucher_order")
+@TableName("voucher_order")
 public class VoucherOrder implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -74,6 +74,5 @@ public class VoucherOrder implements Serializable {
      * 更新时间
      */
     private LocalDateTime updateTime;
-
 
 }

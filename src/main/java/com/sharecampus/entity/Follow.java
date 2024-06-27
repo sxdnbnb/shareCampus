@@ -10,16 +10,11 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-/**
- * <p>
- * 
- * </p>
- *
- */
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("tb_follow")
+@TableName("follow")
 public class Follow implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -22,6 +22,12 @@ public class VoucherOrderController {
     @Resource
     private IVoucherOrderService voucherOrderService;
 
+    /**
+     * 抢场馆券
+     *
+     * @param voucherId 场馆券
+     * @return 订单id
+     */
     @PostMapping("seckill/{id}")
     public Result seckillVoucher(@PathVariable("id") Long voucherId){
         return voucherOrderService.seckillVoucher(voucherId);

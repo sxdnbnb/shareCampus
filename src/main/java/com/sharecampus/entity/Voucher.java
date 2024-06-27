@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("tb_voucher")
+@TableName("voucher")
 public class Voucher implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -45,7 +45,7 @@ public class Voucher implements Serializable {
     /**
      * 使用时间规则
      */
-    private String rules;
+    private String timeRules;
 
     /**
      * 库存
@@ -55,30 +55,13 @@ public class Voucher implements Serializable {
     /**
      * 发放时间
      */
-    // @TableField(exist = false)
     private LocalDateTime beginTime;
 
     /**
      * 发放结束时间
      */
-    // @TableField(exist = false)
     private LocalDateTime endTime;
 
-    /**
-     * 场所类型的id
-     */
-    private Long typeId;
-
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
-
-
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updateTime;
 
 
 }
